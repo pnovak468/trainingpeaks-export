@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:">
+<title>TrainingPeaks Export</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-run" viewBox="0 0 24 24"><path d="M4 17l4-4 3 3 5-6 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M5 5h14v10H9l-4 4z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-zones" viewBox="0 0 24 24"><path d="M5 19V13M10 19V9M15 19V11M20 19V5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M5 5.5A1.5 1.5 0 0 1 6.5 4H19v14H6.5A1.5 1.5 0 0 0 5 19.5zM5 19.5A1.5 1.5 0 0 0 6.5 21H19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8 11V8a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.8"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="m20 20-4.5-4.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+    <symbol id="i-zip" viewBox="0 0 24 24"><path d="M7 3h7l5 5v11a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 3v5h5M10 7h1M10 10h1M10 13h1M10 16h1" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+    <symbol id="i-alert" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5v5.5M12 16.5v.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  </defs>
+</svg>
+
+<header class="titlebar">
+  <div class="brand">
+    <img class="mark" src="icon.png" alt="">
+    <span>TrainingPeaks Export</span>
+  </div>
+  <div class="account" id="account" hidden>
+    <span class="avatar" id="avatar"></span>
+    <span class="who" id="coach"></span>
+    <button class="ghost small" id="sign-out">Sign out</button>
+  </div>
+</header>
+
+<div class="screen" id="loading">
+  <div class="center"><span class="spinner"></span></div>
+</div>
+
+<div class="screen" id="signed-out" hidden>
+  <div class="scroll">
+    <div class="welcome">
+      <img class="hero-mark" src="icon.png" alt="">
+      <h1>Download your TrainingPeaks account</h1>
+      <p class="lead">Pick your athletes and dates, and get everything in one zip, saved on this computer.</p>
+      <ul class="includes">
+        <li><svg><use href="#i-run"/></svg><div><b>Workouts and recordings</b><span>Planned and done, with samples and laps</span></div></li>
+        <li><svg><use href="#i-chat"/></svg><div><b>Comments and notes</b><span>Under each workout, and on the calendar</span></div></li>
+        <li><svg><use href="#i-zones"/></svg><div><b>Zones and settings</b><span>Each athlete's thresholds and zones</span></div></li>
+        <li><svg><use href="#i-book"/></svg><div><b>Workout library</b><span>Your saved workouts</span></div></li>
+      </ul>
+      <div class="notice bad" id="signed-out-error" hidden><svg><use href="#i-alert"/></svg><span></span></div>
+      <button class="primary large" id="sign-in">Sign in to TrainingPeaks</button>
+      <p class="fine"><svg><use href="#i-lock"/></svg>Your password goes only to TrainingPeaks.</p>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="choose" hidden>
+  <div class="scroll">
+    <div class="content">
+      <h1>What to download</h1>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Athletes <span class="count" id="athlete-count"></span></h2>
+          <button class="ghost small" id="toggle-all">Select none</button>
+        </div>
+        <label class="search" id="search-box" hidden>
+          <svg><use href="#i-search"/></svg>
+          <input type="search" id="search" placeholder="Find an athlete" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="list" id="athletes"></div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>Dates</h2></div>
+        <div class="dates">
+          <label class="field"><span>From</span><input type="date" id="from"></label>
+          <span class="dash">–</span>
+          <label class="field"><span>To</span><input type="date" id="to"></label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <label class="toggle">
+          <div><b>Workout library</b><span>Every library you can see in TrainingPeaks</span></div>
+          <input type="checkbox" id="library" checked>
+          <span class="switch" aria-hidden="true"></span>
+        </label>
+      </section>
+
+      <div class="notice bad" id="choose-error" hidden><svg><use href="#i-alert"/></svg><span></span></div>
+    </div>
+  </div>
+  <footer class="bar">
+    <span class="summary" id="choice-summary"></span>
+    <button class="primary" id="download">Download</button>
+  </footer>
+</div>
+
+<div class="screen" id="running" hidden>
+  <div class="scroll">
+    <div class="content">
+      <div class="progress-head">
+        <h1>Downloading</h1>
+        <span class="percent" id="percent">0%</span>
+      </div>
+      <div class="meter"><div id="meter"></div></div>
+      <p class="status" id="status">Starting…</p>
+      <section class="panel tight"><div class="steps" id="steps"></div></section>
+    </div>
+  </div>
+  <footer class="bar">
+    <span class="summary">You can stop now and carry on later with the same choices.</span>
+    <button id="stop">Stop</button>
+  </footer>
+</div>
+
+<div class="screen" id="done" hidden>
+  <div class="scroll">
+    <div class="content">
+      <div class="done-head">
+        <span class="ok"><svg><use href="#i-check"/></svg></span>
+        <h1>Your download is ready</h1>
+      </div>
+      <section class="panel file">
+        <span class="file-icon"><svg><use href="#i-zip"/></svg></span>
+        <div class="file-name"><b id="file-name"></b><span id="file-folder"></span></div>
+        <button id="show">Show in folder</button>
+      </section>
+      <div class="stats" id="stats"></div>
+      <div class="notice warn" id="problems" hidden><svg><use href="#i-alert"/></svg><span></span></div>
+      <p class="hint">Keep this file. You'll upload it to bring your athletes over.</p>
+    </div>
+  </div>
+  <footer class="bar">
+    <span class="summary"></span>
+    <button id="again">Download more</button>
+  </footer>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

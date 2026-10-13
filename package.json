@@ -1,0 +1,63 @@
+{
+  "name": "trainingpeaks-export",
+  "productName": "TrainingPeaks Export",
+  "version": "0.1.0",
+  "description": "Downloads a coach's TrainingPeaks account to a zip on their computer.",
+  "homepage": "https://github.com/pnovak468/trainingpeaks-export",
+  "private": true,
+  "type": "module",
+  "main": "main.mjs",
+  "author": "TrainingPeaks Export",
+  "scripts": {
+    "start": "electron .",
+    "dist:mac": "electron-builder --mac",
+    "dist:win": "electron-builder --win",
+    "dist:linux": "electron-builder --linux",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "yazl": "3.3.1"
+  },
+  "devDependencies": {
+    "electron": "40.10.2",
+    "electron-builder": "26.0.12",
+    "vitest": "4.1.10"
+  },
+  "build": {
+    "appId": "app.tpexport.desktop",
+    "productName": "TrainingPeaks Export",
+    "files": [
+      "main.mjs",
+      "preload.cjs",
+      "export.mjs",
+      "store.mjs",
+      "ui/**"
+    ],
+    "mac": {
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "universal"
+          ]
+        }
+      ],
+      "category": "public.app-category.sports",
+      "identity": "-"
+    },
+    "win": {
+      "target": "nsis"
+    },
+    "nsis": {
+      "oneClick": true
+    },
+    "linux": {
+      "target": [
+        "deb"
+      ],
+      "category": "Utility",
+      "maintainer": "pnovak468 <44118987+pnovak468@users.noreply.github.com>"
+    },
+    "artifactName": "TrainingPeaks-Export-${version}-${os}-${arch}.${ext}"
+  }
+}
