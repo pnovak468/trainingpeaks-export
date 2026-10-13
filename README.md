@@ -11,14 +11,19 @@ imports it can be fixed and rerun without the coach downloading again.
 
 ## Install
 
-Download the file for your computer from the
-[Releases page](https://github.com/pnovak468/trainingpeaks-export/releases).
-The app isn't signed by Apple or Microsoft yet, so each system asks once
-whether to trust it.
+Download the file for your computer. These links always give the latest
+version:
+
+- Mac: [TrainingPeaks-Export-mac-universal.dmg](https://github.com/pnovak468/trainingpeaks-export/releases/latest/download/TrainingPeaks-Export-mac-universal.dmg)
+- Windows: [TrainingPeaks-Export-win-x64.exe](https://github.com/pnovak468/trainingpeaks-export/releases/latest/download/TrainingPeaks-Export-win-x64.exe)
+- Linux: [TrainingPeaks-Export-linux-amd64.deb](https://github.com/pnovak468/trainingpeaks-export/releases/latest/download/TrainingPeaks-Export-linux-amd64.deb)
+
+No GitHub account is needed. The app isn't signed by Apple or Microsoft
+yet, so each system asks once whether to trust it.
 
 ### Mac
 
-1. Download `TrainingPeaks-Export-<version>-mac-universal.dmg`. It runs on
+1. Download `TrainingPeaks-Export-mac-universal.dmg`. It runs on
    both Apple Silicon and Intel Macs.
 2. Open it and drag **TrainingPeaks Export** into **Applications**.
 3. Open the app from Applications. The Mac says it can't check the app
@@ -31,7 +36,7 @@ From then on it opens like any other app.
 
 ### Windows
 
-1. Download `TrainingPeaks-Export-<version>-win-x64.exe`.
+1. Download `TrainingPeaks-Export-win-x64.exe`.
 2. Run it. If Windows says **Windows protected your PC**, click
    **More info**, then **Run anyway**.
 3. It installs for your user only, with no questions, and opens. It's in
@@ -42,10 +47,10 @@ Uninstall**.
 
 ### Linux (Ubuntu, Debian and their relatives)
 
-1. Download `TrainingPeaks-Export-<version>-linux-amd64.deb`.
+1. Download `TrainingPeaks-Export-linux-amd64.deb`.
 2. Install it:
    ```sh
-   sudo apt install ./TrainingPeaks-Export-<version>-linux-amd64.deb
+   sudo apt install ./TrainingPeaks-Export-linux-amd64.deb
    ```
 3. Open **TrainingPeaks Export** from your apps.
 
@@ -72,15 +77,20 @@ sudo chown root:root node_modules/electron/dist/chrome-sandbox
 sudo chmod 4755 node_modules/electron/dist/chrome-sandbox
 ```
 
-## Build the installers
+## Release a version
 
-Each one is built on its own system; the files land in `dist/`.
+Push a version tag. GitHub Actions builds the Mac, Windows and Linux
+installers on its own machines and puts them on a Release, in about ten
+minutes; the links above then give the new version.
 
 ```sh
-npm run dist:mac     # on a Mac: TrainingPeaks-Export-<version>-mac-universal.dmg
-npm run dist:win     # on Windows: TrainingPeaks-Export-<version>-win-x64.exe
-npm run dist:linux   # on Linux: TrainingPeaks-Export-<version>-linux-amd64.deb
+git tag v0.1.0
+git push origin v0.1.0
 ```
+
+The version in the app comes from the tag. To build one installer by hand
+instead, on its own system: `npm run dist:mac`, `npm run dist:win` or
+`npm run dist:linux`. The files land in `dist/`.
 
 The Mac build is signed ad hoc, not with an Apple Developer ID. Without
 that signature an Apple Silicon Mac calls the app damaged and offers no way

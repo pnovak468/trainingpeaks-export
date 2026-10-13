@@ -58,6 +58,6 @@
       "category": "Utility",
       "maintainer": "pnovak468 <44118987+pnovak468@users.noreply.github.com>"
     },
-    "artifactName": "TrainingPeaks-Export-${version}-${os}-${arch}.${ext}"
+    "artifactName": "TrainingPeaks-Export-${os}-${arch}.${ext}"
   }
 }
