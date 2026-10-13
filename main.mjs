@@ -9,7 +9,7 @@ import { app, BrowserWindow, Menu, ipcMain, nativeTheme, session, dialog, shell 
 import { createHash } from "node:crypto";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
-import { exportAccount, trainingPeaks, athletesOf, coachOf, SignInNeeded, Cancelled, TP_API } from "./export.mjs";
+import { exportAccount, trainingPeaks, athletesOf, coachOf, SignInNeeded, Cancelled, PaymentRequired, TP_API } from "./export.mjs";
 import { folderStore, zipFolder, removeFolder } from "./store.mjs";
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -58,6 +58,12 @@ async function state() {
   try {
     user = await tp.user();
   } catch (error) {
+    if (error instanceof PaymentRequired) {
+      // The sign-in itself works, so keeping it would sign the same account
+      // straight back in. Dropping it lets the coach sign in as someone else.
+      await signOut();
+      return { signedIn: false, paymentRequired: true, reason: error.reason };
+    }
     if (!(error instanceof SignInNeeded)) return { signedIn: false, error: error.message };
     user = null;
     return { signedIn: false };

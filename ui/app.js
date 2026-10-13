@@ -51,9 +51,17 @@ function icon(name) {
 
 // ---------------------------------------------------------------- choose
 
+function signedOutError(state) {
+  if (state.paymentRequired) {
+    const said = state.reason ? ` TrainingPeaks said "${state.reason}".` : "";
+    return `TrainingPeaks wants a paid subscription on this account before it shares the data.${said} Sign in with your coach account, or check the subscription on trainingpeaks.com.`;
+  }
+  return state.error ? `Couldn't reach TrainingPeaks: ${state.error}` : "";
+}
+
 function render(state) {
   if (!state.signedIn) {
-    say("signed-out-error", state.error ? `Couldn't reach TrainingPeaks: ${state.error}` : "");
+    say("signed-out-error", signedOutError(state));
     show("signed-out");
     return;
   }

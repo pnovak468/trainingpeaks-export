@@ -26,8 +26,28 @@ const RANGE_DAYS = 31;
 
 export class SignInNeeded extends Error {}
 export class Cancelled extends Error {}
+/** TrainingPeaks answered 402: the account needs a subscription it lacks. */
+export class PaymentRequired extends Error {
+  constructor(message, reason) {
+    super(message);
+    this.reason = reason;
+  }
+}
 
 const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/** The reason TrainingPeaks gave in a refusal's body, or "". */
+async function reasonIn(response) {
+  const text = (await response.text().catch(() => "")).trim();
+  let reason = text;
+  try {
+    const body = JSON.parse(text);
+    reason = body?.message ?? body?.Message ?? body?.error_description ?? body?.error ?? "";
+  } catch {}
+  // A web page instead of an answer says nothing worth showing.
+  if (typeof reason !== "string" || reason.startsWith("<")) return "";
+  return reason.trim().slice(0, 200);
+}
 
 /**
  * Reads TrainingPeaks with a bearer token. `token({ fresh })` hands one over;
@@ -44,6 +64,13 @@ export function trainingPeaks({ token, fetchImpl = fetch, retryMs = 2000 }) {
         if (renewed) throw new SignInNeeded("TrainingPeaks signed you out. Sign in again to carry on.");
         renewed = true;
         continue;
+      }
+      if (response.status === 402) {
+        const reason = await reasonIn(response);
+        throw new PaymentRequired(
+          `TrainingPeaks answered 402 Payment Required for ${path.split("?")[0]}${reason ? `: ${reason}` : ""}`,
+          reason,
+        );
       }
       if (missing.includes(response.status)) return null;
       if ((response.status === 429 || response.status >= 500) && attempt < 4) {

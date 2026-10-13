@@ -10,6 +10,7 @@ import {
   athletesOf,
   SignInNeeded,
   Cancelled,
+  PaymentRequired,
 } from "./export.mjs";
 import { folderStore, zipFolder } from "./store.mjs";
 
@@ -102,6 +103,25 @@ describe("trainingPeaks", () => {
     const tp = trainingPeaks({ token: async () => "t", fetchImpl: async () => response(statuses.shift()!), retryMs: 0 });
     await expect(tp.detail(1, 2)).resolves.toBeNull();
     expect(statuses).toEqual([]);
+  });
+
+  it("stops at a 402 and keeps the reason TrainingPeaks gave", async () => {
+    const tp = trainingPeaks({
+      token: async () => "t",
+      fetchImpl: async () => response(402, { message: "Premium required" }),
+    });
+    const refused = await tp.user().catch((error: unknown) => error);
+    expect(refused).toBeInstanceOf(PaymentRequired);
+    expect(refused).toMatchObject({
+      reason: "Premium required",
+      message: "TrainingPeaks answered 402 Payment Required for /users/v3/user: Premium required",
+    });
+
+    const page = trainingPeaks({
+      token: async () => "t",
+      fetchImpl: async () => new Response("<html>Payment</html>", { status: 402 }),
+    });
+    await expect(page.user()).rejects.toMatchObject({ reason: "" });
   });
 });
 
